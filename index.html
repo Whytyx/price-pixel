@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#1a1c2e" />
+  <meta name="description" content="คำนวณราคาต่อหน่วย และเทียบความคุ้มค่า — Pixel Calculator V1.0.0" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Price Pixel" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png" />
+  <link rel="apple-touch-icon" href="./icon-192.png" />
+  <title>Price Pixel V1.0.0 — คำนวณราคาต่อหน่วย</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Kanit:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #1a1c2e;
+      --panel: #2a2d4a;
+      --panel2: #34385c;
+      --border: #ffe66d;
+      --border-dim: #c4a84a;
+      --text: #f4f0e6;
+      --muted: #a8a4c0;
+      --cyan: #5ce1ff;
+      --green: #5dff8a;
+      --pink: #ff6bb5;
+      --orange: #ff9f43;
+      --red: #ff6b6b;
+      --shadow: #0d0e1a;
+      --pixel: 4px;
+      --font-pixel: "Press Start 2P", "Courier New", monospace;
+      --font-thai: "Kanit", "Tahoma", "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-thai);
+      -webkit-tap-highlight-color: transparent;
+    }
+    body {
+      background-image:
+        linear-gradient(rgba(255,230,109,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,230,109,0.03) 1px, transparent 1px);
+      background-size: 16px 16px;
+      padding: 12px 12px 40px;
+      padding-bottom: max(40px, env(safe-area-inset-bottom));
+    }
+
+    .wrap {
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    /* Pixel panel */
+    .pixel-box {
+      background: var(--panel);
+      border: var(--pixel) solid var(--border);
+      box-shadow:
+        0 0 0 2px var(--shadow),
+        6px 6px 0 var(--shadow);
+      image-rendering: pixelated;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 16px;
+      padding: 16px 12px 14px;
+    }
+    header .logo {
+      font-family: var(--font-pixel);
+      font-size: 15px;
+      color: var(--border);
+      line-height: 1.6;
+      text-shadow: 3px 3px 0 var(--shadow);
+      letter-spacing: 1px;
+    }
+    header .sub {
+      margin-top: 10px;
+      font-size: 14px;
+      color: var(--muted);
+      font-weight: 400;
+    }
+    header .ver {
+      display: inline-block;
+      margin-top: 10px;
+      font-family: var(--font-pixel);
+      font-size: 8px;
+      color: var(--cyan);
+      background: var(--bg);
+      border: 2px solid var(--cyan);
+      padding: 4px 8px;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .tab {
+      font-family: var(--font-thai);
+      font-weight: 700;
+      font-size: 16px;
+      padding: 12px 8px;
+      background: var(--panel2);
+      color: var(--muted);
+      border: var(--pixel) solid var(--border-dim);
+      box-shadow: 3px 3px 0 var(--shadow);
+      cursor: pointer;
+      transition: transform 0.05s;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    .tab:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--shadow); }
+    .tab.active {
+      background: var(--border);
+      color: var(--bg);
+      border-color: #fff3a8;
+      box-shadow: 3px 3px 0 var(--shadow);
+    }
+    .tab .en {
+      display: block;
+      font-family: var(--font-pixel);
+      font-size: 8px;
+      margin-top: 4px;
+      opacity: 0.85;
+    }
+
+    .panel { display: none; padding: 16px 14px; margin-bottom: 14px; }
+    .panel.active { display: block; }
+
+    label.field-label {
+      display: block;
+      font-size: 13px;
+      color: var(--cyan);
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    .field { margin-bottom: 14px; }
+
+    input[type="text"],
+    input[type="number"],
+    select {
+      width: 100%;
+      font-family: var(--font-thai);
+      font-size: 18px;
+      font-weight: 600;
+      padding: 12px 12px;
+      background: var(--bg);
+      color: var(--text);
+      border: 3px solid var(--border-dim);
+      outline: none;
+      border-radius: 0;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    input:focus, select:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 2px rgba(92, 225, 255, 0.25);
+    }
+    input::placeholder { color: #6a6680; font-weight: 400; }
+
+    .row-2 {
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 10px;
+    }
+
+    select {
+      background-image: linear-gradient(45deg, transparent 50%, var(--border) 50%),
+                        linear-gradient(135deg, var(--border) 50%, transparent 50%);
+      background-position: calc(100% - 18px) 50%, calc(100% - 12px) 50%;
+      background-size: 6px 6px, 6px 6px;
+      background-repeat: no-repeat;
+      padding-right: 32px;
+      cursor: pointer;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 4px;
+      margin-bottom: 4px;
+    }
+    .btn {
+      flex: 1;
+      font-family: var(--font-thai);
+      font-weight: 700;
+      font-size: 14px;
+      padding: 10px 8px;
+      border: 3px solid var(--border-dim);
+      background: var(--panel2);
+      color: var(--text);
+      cursor: pointer;
+      box-shadow: 3px 3px 0 var(--shadow);
+    }
+    .btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--shadow); }
+    .btn.ghost { color: var(--muted); }
+    .btn.primary {
+      background: var(--cyan);
+      color: var(--bg);
+      border-color: #9ef0ff;
+    }
+
+    /* Results */
+    .results {
+      margin-top: 16px;
+      padding: 14px;
+      background: var(--bg);
+      border: 3px solid var(--cyan);
+      min-height: 80px;
+    }
+    .results.empty {
+      border-color: var(--border-dim);
+      color: var(--muted);
+      text-align: center;
+      font-size: 14px;
+      padding: 24px 12px;
+    }
+    .big-price {
+      font-family: var(--font-pixel);
+      font-size: 18px;
+      color: var(--border);
+      line-height: 1.7;
+      text-align: center;
+      margin-bottom: 6px;
+      word-break: break-word;
+    }
+    .big-unit {
+      text-align: center;
+      font-size: 15px;
+      color: var(--cyan);
+      margin-bottom: 14px;
+      font-weight: 600;
+    }
+    .conv-list {
+      display: grid;
+      gap: 8px;
+    }
+    .conv-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+      padding: 8px 10px;
+      background: var(--panel);
+      border: 2px solid var(--panel2);
+      font-size: 14px;
+    }
+    .conv-item .u { color: var(--muted); }
+    .conv-item .v {
+      font-family: var(--font-pixel);
+      font-size: 10px;
+      color: var(--text);
+      text-align: right;
+    }
+    .conv-item.highlight {
+      border-color: var(--green);
+      background: rgba(93, 255, 138, 0.08);
+    }
+    .conv-item.highlight .v { color: var(--green); }
+
+    /* Compare cards */
+    .cards {
+      display: grid;
+      gap: 12px;
+    }
+    .card {
+      padding: 12px;
+      background: var(--bg);
+      border: 3px solid var(--border-dim);
+      position: relative;
+    }
+    .card.winner {
+      border-color: var(--green);
+      box-shadow: 0 0 0 2px rgba(93, 255, 138, 0.35);
+    }
+    .card-title {
+      font-family: var(--font-pixel);
+      font-size: 10px;
+      color: var(--pink);
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .card.winner .card-title { color: var(--green); }
+    .badge {
+      font-family: var(--font-thai);
+      font-size: 12px;
+      font-weight: 700;
+      background: var(--green);
+      color: var(--bg);
+      padding: 3px 8px;
+      border: 2px solid #b8ffcf;
+    }
+    .unit-price-line {
+      margin-top: 8px;
+      padding: 8px;
+      background: var(--panel);
+      border: 2px solid var(--panel2);
+      font-size: 13px;
+      text-align: center;
+    }
+    .unit-price-line strong {
+      font-family: var(--font-pixel);
+      font-size: 11px;
+      color: var(--border);
+      display: block;
+      margin-top: 4px;
+      line-height: 1.6;
+    }
+
+    .winner-banner {
+      margin-top: 14px;
+      padding: 14px 12px;
+      text-align: center;
+      background: rgba(93, 255, 138, 0.12);
+      border: 3px solid var(--green);
+      display: none;
+    }
+    .winner-banner.show { display: block; }
+    .winner-banner .lbl {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .winner-banner .name {
+      font-family: var(--font-pixel);
+      font-size: 12px;
+      color: var(--green);
+      line-height: 1.7;
+      word-break: break-word;
+    }
+    .winner-banner .save {
+      margin-top: 8px;
+      font-size: 14px;
+      color: var(--text);
+      font-weight: 600;
+    }
+    .tie-banner {
+      margin-top: 14px;
+      padding: 14px;
+      text-align: center;
+      border: 3px solid var(--orange);
+      background: rgba(255, 159, 67, 0.1);
+      color: var(--orange);
+      font-weight: 700;
+      display: none;
+    }
+    .tie-banner.show { display: block; }
+
+    .hint {
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .warn {
+      margin-top: 10px;
+      font-size: 13px;
+      color: var(--orange);
+      padding: 8px;
+      border: 2px dashed var(--orange);
+      display: none;
+    }
+    .warn.show { display: block; }
+
+    footer {
+      text-align: center;
+      margin-top: 20px;
+      font-family: var(--font-pixel);
+      font-size: 7px;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .vs {
+      text-align: center;
+      font-family: var(--font-pixel);
+      font-size: 12px;
+      color: var(--border);
+      margin: 4px 0;
+      text-shadow: 2px 2px 0 var(--shadow);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="pixel-box">
+      <div class="logo">PRICE PIXEL</div>
+      <div class="sub">คำนวณราคาต่อหน่วย · เทียบความคุ้มค่า</div>
+      <div class="ver">V1.0.0</div>
+    </header>
+
+    <div class="tabs" role="tablist">
+      <button type="button" class="tab active" id="tab-single" role="tab" aria-selected="true" data-mode="single">
+        คำนวณ
+        <span class="en">SINGLE</span>
+      </button>
+      <button type="button" class="tab" id="tab-compare" role="tab" aria-selected="false" data-mode="compare">
+        เทียบ
+        <span class="en">COMPARE</span>
+      </button>
+    </div>
+
+    <!-- SINGLE -->
+    <section class="panel pixel-box active" id="panel-single" role="tabpanel">
+      <div class="field">
+        <label class="field-label" for="s-price">ราคา (บาท)</label>
+        <input type="number" id="s-price" inputmode="decimal" min="0" step="any" placeholder="เช่น 45.50" />
+      </div>
+      <div class="row-2">
+        <div class="field">
+          <label class="field-label" for="s-qty">ปริมาณ</label>
+          <input type="number" id="s-qty" inputmode="decimal" min="0" step="any" placeholder="เช่น 250" />
+        </div>
+        <div class="field">
+          <label class="field-label" for="s-unit">หน่วย</label>
+          <select id="s-unit">
+            <optgroup label="น้ำหนัก">
+              <option value="g">กรัม (g)</option>
+              <option value="kg" selected>กิโลกรัม (kg)</option>
+              <option value="mg">มิลลิกรัม (mg)</option>
+            </optgroup>
+            <optgroup label="ปริมาตร">
+              <option value="ml">มิลลิลิตร (ml)</option>
+              <option value="L">ลิตร (L)</option>
+            </optgroup>
+            <optgroup label="ชิ้น">
+              <option value="pcs">ชิ้น (pcs)</option>
+              <option value="pack">แพ็ค (pack)</option>
+            </optgroup>
+          </select>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button type="button" class="btn ghost" id="s-clear">ล้าง</button>
+      </div>
+      <div class="results empty" id="s-results">กรอกราคาและปริมาณเพื่อคำนวณ</div>
+    </section>
+
+    <!-- COMPARE -->
+    <section class="panel pixel-box" id="panel-compare" role="tabpanel">
+      <div class="cards">
+        <div class="card" id="card-a">
+          <div class="card-title">
+            <span>PRODUCT A</span>
+            <span class="badge" id="badge-a" hidden>คุ้มกว่า ★</span>
+          </div>
+          <div class="field">
+            <label class="field-label" for="a-name">ชื่อ (ไม่บังคับ)</label>
+            <input type="text" id="a-name" placeholder="เช่น นม A" maxlength="40" />
+          </div>
+          <div class="field">
+            <label class="field-label" for="a-price">ราคา (บาท)</label>
+            <input type="number" id="a-price" inputmode="decimal" min="0" step="any" placeholder="เช่น 35" />
+          </div>
+          <div class="row-2">
+            <div class="field">
+              <label class="field-label" for="a-qty">ปริมาณ</label>
+              <input type="number" id="a-qty" inputmode="decimal" min="0" step="any" placeholder="เช่น 200" />
+            </div>
+            <div class="field">
+              <label class="field-label" for="a-unit">หน่วย</label>
+              <select id="a-unit">
+                <optgroup label="น้ำหนัก">
+                  <option value="g">กรัม (g)</option>
+                  <option value="kg">กิโลกรัม (kg)</option>
+                  <option value="mg">มิลลิกรัม (mg)</option>
+                </optgroup>
+                <optgroup label="ปริมาตร">
+                  <option value="ml" selected>มิลลิลิตร (ml)</option>
+                  <option value="L">ลิตร (L)</option>
+                </optgroup>
+                <optgroup label="ชิ้น">
+                  <option value="pcs">ชิ้น (pcs)</option>
+                  <option value="pack">แพ็ค (pack)</option>
+                </optgroup>
+              </select>
+            </div>
+          </div>
+          <div class="unit-price-line" id="a-uprice">ราคาต่อหน่วย: —</div>
+        </div>
+
+        <div class="vs">VS</div>
+
+        <div class="card" id="card-b">
+          <div class="card-title">
+            <span>PRODUCT B</span>
+            <span class="badge" id="badge-b" hidden>คุ้มกว่า ★</span>
+          </div>
+          <div class="field">
+            <label class="field-label" for="b-name">ชื่อ (ไม่บังคับ)</label>
+            <input type="text" id="b-name" placeholder="เช่น นม B" maxlength="40" />
+          </div>
+          <div class="field">
+            <label class="field-label" for="b-price">ราคา (บาท)</label>
+            <input type="number" id="b-price" inputmode="decimal" min="0" step="any" placeholder="เช่น 49" />
+          </div>
+          <div class="row-2">
+            <div class="field">
+              <label class="field-label" for="b-qty">ปริมาณ</label>
+              <input type="number" id="b-qty" inputmode="decimal" min="0" step="any" placeholder="เช่น 1" />
+            </div>
+            <div class="field">
+              <label class="field-label" for="b-unit">หน่วย</label>
+              <select id="b-unit">
+                <optgroup label="น้ำหนัก">
+                  <option value="g">กรัม (g)</option>
+                  <option value="kg">กิโลกรัม (kg)</option>
+                  <option value="mg">มิลลิกรัม (mg)</option>
+                </optgroup>
+                <optgroup label="ปริมาตร">
+                  <option value="ml">มิลลิลิตร (ml)</option>
+                  <option value="L" selected>ลิตร (L)</option>
+                </optgroup>
+                <optgroup label="ชิ้น">
+                  <option value="pcs">ชิ้น (pcs)</option>
+                  <option value="pack">แพ็ค (pack)</option>
+                </optgroup>
+              </select>
+            </div>
+          </div>
+          <div class="unit-price-line" id="b-uprice">ราคาต่อหน่วย: —</div>
+        </div>
+      </div>
+
+      <div class="warn" id="c-warn">หน่วยคนละประเภท — เทียบราคาต่อหน่วยตามที่กรอก (ไม่แปลงข้ามประเภท)</div>
+      <div class="winner-banner" id="c-winner">
+        <div class="lbl">คุ้มกว่าคือ</div>
+        <div class="name" id="c-winner-name">—</div>
+        <div class="save" id="c-save"></div>
+      </div>
+      <div class="tie-banner" id="c-tie">ราคาต่อหน่วยเท่ากัน — คุ้มเท่ากัน!</div>
+
+      <div class="btn-row" style="margin-top:14px">
+        <button type="button" class="btn ghost" id="c-clear">ล้างทั้งคู่</button>
+        <button type="button" class="btn primary" id="c-swap">สลับ A ↔ B</button>
+      </div>
+      <p class="hint">เคล็ดลับ: หน่วยในตระกูลเดียวกัน (เช่น ml ↔ L หรือ g ↔ kg) จะถูกแปลงให้อัตโนมัติก่อนเทียบ</p>
+    </section>
+
+    <footer>
+      PRICE PIXEL V1.0.0<br />
+      for ไบคัง · Whytyx
+    </footer>
+  </div>
+
+  <script>
+    /* ===== Unit system ===== */
+    const UNIT_META = {
+      mg:  { family: 'mass',   toBase: 0.001,   label: 'มก.',   en: 'mg',  base: 'g' },
+      g:   { family: 'mass',   toBase: 1,       label: 'กรัม',  en: 'g',   base: 'g' },
+      kg:  { family: 'mass',   toBase: 1000,    label: 'กก.',   en: 'kg',  base: 'g' },
+      ml:  { family: 'volume', toBase: 1,       label: 'มล.',   en: 'ml',  base: 'ml' },
+      L:   { family: 'volume', toBase: 1000,    label: 'ลิตร',  en: 'L',   base: 'ml' },
+      pcs: { family: 'count',  toBase: 1,       label: 'ชิ้น',  en: 'pcs', base: 'pcs' },
+      pack:{ family: 'count',  toBase: 1,       label: 'แพ็ค',  en: 'pack',base: 'pack' },
+    };
+
+    const FAMILY_DISPLAY = {
+      mass: [
+        { unit: 'g',  label: 'บาท / กรัม' },
+        { unit: 'kg', label: 'บาท / กิโลกรัม' },
+        { unit: 'mg', label: 'บาท / มิลลิกรัม' },
+      ],
+      volume: [
+        { unit: 'ml', label: 'บาท / มิลลิลิตร' },
+        { unit: 'L',  label: 'บาท / ลิตร' },
+      ],
+      count: [
+        { unit: 'pcs',  label: 'บาท / ชิ้น' },
+        { unit: 'pack', label: 'บาท / แพ็ค' },
+      ],
+    };
+
+    function parseNum(el) {
+      const v = parseFloat(String(el.value).replace(',', '.'));
+      return Number.isFinite(v) && v >= 0 ? v : NaN;
+    }
+
+    function fmtBaht(n) {
+      if (!Number.isFinite(n)) return '—';
+      if (n === 0) return '0';
+      const abs = Math.abs(n);
+      let digits;
+      if (abs >= 1000) digits = 2;
+      else if (abs >= 1) digits = 2;
+      else if (abs >= 0.01) digits = 4;
+      else if (abs >= 0.0001) digits = 6;
+      else digits = 8;
+      let s = n.toFixed(digits).replace(/\.?0+$/, '');
+      // Thai-friendly grouping
+      const parts = s.split('.');
+      parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+      return parts.join('.');
+    }
+
+    function toBaseQty(qty, unit) {
+      const m = UNIT_META[unit];
+      if (!m) return NaN;
+      return qty * m.toBase;
+    }
+
+    function pricePerBase(price, qty, unit) {
+      const baseQty = toBaseQty(qty, unit);
+      if (!baseQty || !Number.isFinite(price)) return NaN;
+      return price / baseQty; // baht per base unit of family
+    }
+
+    function pricePerUnit(price, qty, fromUnit, toUnit) {
+      const metaFrom = UNIT_META[fromUnit];
+      const metaTo = UNIT_META[toUnit];
+      if (!metaFrom || !metaTo || metaFrom.family !== metaTo.family) return NaN;
+      // For count family, pcs and pack are not convertible across each other meaningfully
+      if (metaFrom.family === 'count' && fromUnit !== toUnit) return NaN;
+      const ppb = pricePerBase(price, qty, fromUnit);
+      if (!Number.isFinite(ppb)) return NaN;
+      return ppb * metaTo.toBase; // baht per `toUnit`
+    }
+
+    /* ===== Tabs ===== */
+    const tabSingle = document.getElementById('tab-single');
+    const tabCompare = document.getElementById('tab-compare');
+    const panelSingle = document.getElementById('panel-single');
+    const panelCompare = document.getElementById('panel-compare');
+
+    function setMode(mode) {
+      const isSingle = mode === 'single';
+      tabSingle.classList.toggle('active', isSingle);
+      tabCompare.classList.toggle('active', !isSingle);
+      tabSingle.setAttribute('aria-selected', isSingle);
+      tabCompare.setAttribute('aria-selected', !isSingle);
+      panelSingle.classList.toggle('active', isSingle);
+      panelCompare.classList.toggle('active', !isSingle);
+    }
+    tabSingle.addEventListener('click', () => setMode('single'));
+    tabCompare.addEventListener('click', () => setMode('compare'));
+
+    /* ===== Single calc ===== */
+    const sPrice = document.getElementById('s-price');
+    const sQty = document.getElementById('s-qty');
+    const sUnit = document.getElementById('s-unit');
+    const sResults = document.getElementById('s-results');
+
+    function calcSingle() {
+      const price = parseNum(sPrice);
+      const qty = parseNum(sQty);
+      const unit = sUnit.value;
+      const meta = UNIT_META[unit];
+
+      if (!Number.isFinite(price) || !Number.isFinite(qty) || qty === 0) {
+        sResults.className = 'results empty';
+        sResults.textContent = 'กรอกราคาและปริมาณเพื่อคำนวณ';
+        return;
+      }
+
+      const family = meta.family;
+      const displays = FAMILY_DISPLAY[family] || [];
+      // Primary: price per entered unit
+      const primary = price / qty;
+
+      let html = `
+        <div class="big-price">${fmtBaht(primary)} ฿</div>
+        <div class="big-unit">ต่อ ${meta.label} (${meta.en})</div>
+        <div class="conv-list">
+      `;
+
+      if (family === 'count') {
+        // Only show same unit
+        html += `
+          <div class="conv-item highlight">
+            <span class="u">บาท / ${meta.label}</span>
+            <span class="v">${fmtBaht(primary)} ฿</span>
+          </div>
+        `;
+        // Also show total context
+        html += `
+          <div class="conv-item">
+            <span class="u">รวม ${fmtBaht(qty)} ${meta.label}</span>
+            <span class="v">${fmtBaht(price)} ฿</span>
+          </div>
+        `;
+      } else {
+        for (const d of displays) {
+          const v = pricePerUnit(price, qty, unit, d.unit);
+          if (!Number.isFinite(v)) continue;
+          const isPrimary = d.unit === unit;
+          html += `
+            <div class="conv-item${isPrimary ? ' highlight' : ''}">
+              <span class="u">${d.label}</span>
+              <span class="v">${fmtBaht(v)} ฿</span>
+            </div>
+          `;
+        }
+      }
+
+      html += '</div>';
+      sResults.className = 'results';
+      sResults.innerHTML = html;
+    }
+
+    [sPrice, sQty, sUnit].forEach((el) => {
+      el.addEventListener('input', calcSingle);
+      el.addEventListener('change', calcSingle);
+    });
+    document.getElementById('s-clear').addEventListener('click', () => {
+      sPrice.value = '';
+      sQty.value = '';
+      sUnit.value = 'kg';
+      calcSingle();
+      sPrice.focus();
+    });
+
+    /* ===== Compare ===== */
+    const aName = document.getElementById('a-name');
+    const aPrice = document.getElementById('a-price');
+    const aQty = document.getElementById('a-qty');
+    const aUnit = document.getElementById('a-unit');
+    const bName = document.getElementById('b-name');
+    const bPrice = document.getElementById('b-price');
+    const bQty = document.getElementById('b-qty');
+    const bUnit = document.getElementById('b-unit');
+    const aUprice = document.getElementById('a-uprice');
+    const bUprice = document.getElementById('b-uprice');
+    const cardA = document.getElementById('card-a');
+    const cardB = document.getElementById('card-b');
+    const badgeA = document.getElementById('badge-a');
+    const badgeB = document.getElementById('badge-b');
+    const cWinner = document.getElementById('c-winner');
+    const cWinnerName = document.getElementById('c-winner-name');
+    const cSave = document.getElementById('c-save');
+    const cTie = document.getElementById('c-tie');
+    const cWarn = document.getElementById('c-warn');
+
+    function displayName(nameEl, fallback) {
+      const n = (nameEl.value || '').trim();
+      return n || fallback;
+    }
+
+    function unitPriceLabel(price, qty, unit) {
+      const meta = UNIT_META[unit];
+      const ppu = price / qty;
+      return `<strong>${fmtBaht(ppu)} ฿ / ${meta.label}</strong>`;
+    }
+
+    function comparableCost(price, qty, unit, preferFamily) {
+      // Returns { ok, costPerBase, family, baseLabel } for comparison
+      const meta = UNIT_META[unit];
+      if (!meta) return { ok: false };
+      if (meta.family === 'count') {
+        // compare within same exact unit only for count
+        return {
+          ok: true,
+          costPerBase: price / qty,
+          family: meta.family,
+          unit,
+          baseLabel: meta.label,
+        };
+      }
+      return {
+        ok: true,
+        costPerBase: pricePerBase(price, qty, unit),
+        family: meta.family,
+        unit: meta.base,
+        baseLabel: UNIT_META[meta.base].label,
+      };
+    }
+
+    function calcCompare() {
+      const ap = parseNum(aPrice), aq = parseNum(aQty);
+      const bp = parseNum(bPrice), bq = parseNum(bQty);
+      const au = aUnit.value, bu = bUnit.value;
+      const ma = UNIT_META[au], mb = UNIT_META[bu];
+
+      // Reset UI
+      cardA.classList.remove('winner');
+      cardB.classList.remove('winner');
+      badgeA.hidden = true;
+      badgeB.hidden = true;
+      cWinner.classList.remove('show');
+      cTie.classList.remove('show');
+      cWarn.classList.remove('show');
+
+      const aReady = Number.isFinite(ap) && Number.isFinite(aq) && aq > 0;
+      const bReady = Number.isFinite(bp) && Number.isFinite(bq) && bq > 0;
+
+      if (aReady) {
+        aUprice.innerHTML = 'ราคาต่อหน่วย: ' + unitPriceLabel(ap, aq, au);
+      } else {
+        aUprice.textContent = 'ราคาต่อหน่วย: —';
+      }
+      if (bReady) {
+        bUprice.innerHTML = 'ราคาต่อหน่วย: ' + unitPriceLabel(bp, bq, bu);
+      } else {
+        bUprice.textContent = 'ราคาต่อหน่วย: —';
+      }
+
+      if (!aReady || !bReady) return;
+
+      const sameFamily = ma.family === mb.family;
+      const countMismatch = ma.family === 'count' && au !== bu;
+
+      if (!sameFamily || countMismatch) {
+        cWarn.classList.add('show');
+        // Fallback: compare raw price-per-entered-unit (not ideal but transparent)
+        const ca = ap / aq;
+        const cb = bp / bq;
+        decideWinner(ca, cb, au, bu, false);
+        return;
+      }
+
+      const ca = comparableCost(ap, aq, au);
+      const cb = comparableCost(bp, bq, bu);
+      decideWinner(ca.costPerBase, cb.costPerBase, ca.baseLabel, cb.baseLabel, true);
+    }
+
+    function decideWinner(costA, costB, labelA, labelB, normalized) {
+      const nameA = displayName(aName, 'สินค้า A');
+      const nameB = displayName(bName, 'สินค้า B');
+      const eps = 1e-9;
+
+      if (Math.abs(costA - costB) < eps * Math.max(1, Math.abs(costA), Math.abs(costB))) {
+        cTie.classList.add('show');
+        return;
+      }
+
+      const aWins = costA < costB;
+      const winner = aWins ? nameA : nameB;
+      const loserCost = aWins ? costB : costA;
+      const winnerCost = aWins ? costA : costB;
+      const savePct = ((loserCost - winnerCost) / loserCost) * 100;
+
+      if (aWins) {
+        cardA.classList.add('winner');
+        badgeA.hidden = false;
+      } else {
+        cardB.classList.add('winner');
+        badgeB.hidden = false;
+      }
+
+      cWinnerName.textContent = winner;
+      const baseNote = normalized
+        ? `ถูกกว่า ~${fmtBaht(savePct)}% (เทียบต่อหน่วยฐานเดียวกัน)`
+        : `ถูกกว่า ~${fmtBaht(savePct)}% (เทียบราคาต่อหน่วยที่กรอก)`;
+      cSave.textContent = baseNote;
+      cWinner.classList.add('show');
+    }
+
+    const compareInputs = [aName, aPrice, aQty, aUnit, bName, bPrice, bQty, bUnit];
+    compareInputs.forEach((el) => {
+      el.addEventListener('input', calcCompare);
+      el.addEventListener('change', calcCompare);
+    });
+
+    document.getElementById('c-clear').addEventListener('click', () => {
+      [aName, aPrice, aQty, bName, bPrice, bQty].forEach((el) => { el.value = ''; });
+      aUnit.value = 'ml';
+      bUnit.value = 'L';
+      calcCompare();
+    });
+
+    document.getElementById('c-swap').addEventListener('click', () => {
+      const pairs = [
+        [aName, bName],
+        [aPrice, bPrice],
+        [aQty, bQty],
+        [aUnit, bUnit],
+      ];
+      for (const [x, y] of pairs) {
+        const t = x.value;
+        x.value = y.value;
+        y.value = t;
+      }
+      calcCompare();
+    });
+
+    /* ===== PWA ===== */
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
+
+    // Init
+    calcSingle();
+    calcCompare();
+  </script>
+</body>
+</html>
