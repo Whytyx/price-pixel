@@ -1,5 +1,10 @@
 # Price Pixel
 
+## V1.0.1 — Dynamic Island / safe-area layout
+- `env(safe-area-inset-top)` clears iPhone Dynamic Island / notch
+- Main content vertically centered (`flex` + `safe center` / `margin-block: auto`), still scrollable when taller than screen
+- `env(safe-area-inset-bottom)` for home indicator
+
 ## V1.0.0 — Cost-per-unit / value comparison calculator
 Pixel-art Thai UI calculator for shopping value.
 

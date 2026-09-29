@@ -1,7 +1,7 @@
 {
   "name": "Price Pixel — คำนวณราคาต่อหน่วย",
   "short_name": "PricePixel",
-  "description": "คำนวณราคาต่อหน่วย และเทียบความคุ้มค่าระหว่างสินค้า — Pixel UI V1.0.0",
+  "description": "คำนวณราคาต่อหน่วย และเทียบความคุ้มค่าระหว่างสินค้า — Pixel UI V1.0.1",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

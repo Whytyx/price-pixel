@@ -4,14 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#1a1c2e" />
-  <meta name="description" content="คำนวณราคาต่อหน่วย และเทียบความคุ้มค่า — Pixel Calculator V1.0.0" />
+  <meta name="description" content="คำนวณราคาต่อหน่วย และเทียบความคุ้มค่า — Pixel Calculator V1.0.1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Price Pixel" />
   <link rel="manifest" href="./manifest.webmanifest" />
   <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png" />
   <link rel="apple-touch-icon" href="./icon-192.png" />
-  <title>Price Pixel V1.0.0 — คำนวณราคาต่อหน่วย</title>
+  <title>Price Pixel V1.0.1 — คำนวณราคาต่อหน่วย</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Kanit:wght@400;600;700&display=swap" rel="stylesheet" />
@@ -36,8 +36,12 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    html {
+      height: 100%;
+    }
     html, body {
       min-height: 100%;
+      min-height: 100dvh;
       background: var(--bg);
       color: var(--text);
       font-family: var(--font-thai);
@@ -48,13 +52,21 @@
         linear-gradient(rgba(255,230,109,0.03) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255,230,109,0.03) 1px, transparent 1px);
       background-size: 16px 16px;
-      padding: 12px 12px 40px;
-      padding-bottom: max(40px, env(safe-area-inset-bottom));
+      display: flex;
+      flex-direction: column;
+      justify-content: safe center;
+      align-items: stretch;
+      padding-top: max(12px, env(safe-area-inset-top, 0px));
+      padding-right: 12px;
+      padding-bottom: max(12px, env(safe-area-inset-bottom, 0px));
+      padding-left: 12px;
     }
 
     .wrap {
+      width: 100%;
       max-width: 480px;
-      margin: 0 auto;
+      margin-inline: auto;
+      margin-block: auto;
     }
 
     /* Pixel panel */
@@ -398,7 +410,7 @@
     <header class="pixel-box">
       <div class="logo">PRICE PIXEL</div>
       <div class="sub">คำนวณราคาต่อหน่วย · เทียบความคุ้มค่า</div>
-      <div class="ver">V1.0.0</div>
+      <div class="ver">V1.0.1</div>
     </header>
 
     <div class="tabs" role="tablist">
@@ -550,7 +562,7 @@
     </section>
 
     <footer>
-      PRICE PIXEL V1.0.0<br />
+      PRICE PIXEL V1.0.1<br />
       for ไบคัง · Whytyx
     </footer>
   </div>
